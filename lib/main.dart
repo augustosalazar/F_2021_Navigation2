@@ -25,8 +25,19 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Navigator(
-      pages: [MaterialPage(child: UserView(didSelectUser: _userSelection))],
+      pages: [
+        MaterialPage(child: UserView(didSelectUser: _userSelection)),
+        if (_selectedUser != null)
+          MaterialPage(
+              child: UserDetailView(user: _selectedUser),
+              key: UserDetailView.valueKey)
+      ],
       onPopPage: (route, result) {
+        final page = route.settings as MaterialPage;
+        if (page.key == UserDetailView.valueKey) {
+          _selectedUser = null;
+        }
+
         return route.didPop(result);
       },
     ));
@@ -60,8 +71,9 @@ class UserView extends StatelessWidget {
 }
 
 class UserDetailView extends StatelessWidget {
-  const UserDetailView({Key key}) : super(key: key);
-
+  const UserDetailView({Key key, this.user}) : super(key: key);
+  static const valueKey = ValueKey('UserDetailView');
+  final String user;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -69,7 +81,7 @@ class UserDetailView extends StatelessWidget {
           appBar: AppBar(
             title: Text('UserDetailView'),
           ),
-          body: Text('Hola')),
+          body: Center(child: Text('Hola $user'))),
     );
   }
 }
